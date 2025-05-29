@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    container_name: transport-web
+    ports:
+      - '8080:80'
+    volumes:
+      - ./src:/var/www/html
+    depends_on:
+      - db
+    environment:
+      APACHE_RUN_USER: www-data
+      APACHE_RUN_GROUP: www-data
+
+  db:
+    image: mysql:8.0
+    container_name: transport-db
+    command: --default-authentication-plugin=mysql_native_password
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpass
+      MYSQL_DATABASE: moscow_transport
+      MYSQL_USER: user
+      MYSQL_PASSWORD: pass
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./db:/docker-entrypoint-initdb.d # Инициализация БД
+    ports:
+      - '3306:3306'
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: transport-pma
+    depends_on:
+      - db
+    environment:
+      PMA_HOST: db
+      PMA_USER: root
+      PMA_PASSWORD: rootpass
+    ports:
+      - '8081:80'
+
+volumes:
+  db_data:
