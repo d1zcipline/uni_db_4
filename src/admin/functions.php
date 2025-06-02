@@ -17,10 +17,17 @@ function require_super_admin($pdo)
                           ORDER BY created_at ASC 
                           LIMIT 1");
   $stmt->execute();
-  $firstAdmin = $stmt->fetch();
+  $firstAdmin = $stmt->fetch(PDO::FETCH_ASSOC);
 
-  if ($firstAdmin && strtotime($firstAdmin['created_at']) === strtotime($_SESSION['user']['created_at'])) {
-    return true;
+  // Проверяем, что данные получены и даты существуют
+  if (
+    $firstAdmin &&
+    isset($firstAdmin['created_at'], $_SESSION['user']['created_at']) &&
+    $firstAdmin['created_at'] !== null &&
+    $_SESSION['user']['created_at'] !== null
+  ) {
+
+    return strtotime($firstAdmin['created_at']) === strtotime($_SESSION['user']['created_at']);
   }
 
   return false;
