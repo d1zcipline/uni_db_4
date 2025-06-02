@@ -156,17 +156,16 @@ $userName = $_SESSION['user']['name'];
                     </td>
                     <td><?= htmlspecialchars($employee['bus_park_name'] ?? 'Не назначен') ?></td>
                     <td>
-                      <a href="#" class="btn btn-sm btn-outline-primary me-2">
+                      <a href="admin/edit_employee.php?id=<?= $employee['id_employee'] ?>"
+                        class="btn btn-sm btn-outline-primary me-2">
                         <i class="bi bi-pencil"></i>
                       </a>
                       <?php if ($employee['id_employee'] !== $_SESSION['user']['id']): ?>
                         <a href="admin/delete_employee.php?id=<?= $employee['id_employee'] ?>"
                           class="btn btn-sm btn-outline-danger"
-                          onclick="return confirm('Вы уверены?')">
+                          onclick="return confirm('Вы уверены что хотите удалить этого сотрудника?')">
                           <i class="bi bi-trash"></i>
                         </a>
-                      <?php else: ?>
-                        <span class="text-muted"></span>
                       <?php endif; ?>
                     </td>
                   </tr>

@@ -3,11 +3,7 @@ session_start();
 require '../includes/db.php';
 require 'functions.php';
 
-// Проверка прав администратора
-if ($_SESSION['user']['role'] !== 'Администратор') {
-  header('Location: ../admin_employees.php');
-  exit;
-}
+require_admin();
 
 // Проверка ID сотрудника
 $employeeId = isset($_GET['id']) ? (int)$_GET['id'] : 0;

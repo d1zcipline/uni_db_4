@@ -1,12 +1,8 @@
 <?php
 session_start();
 require '../includes/db.php';
-
-// Проверка прав администратора
-if ($_SESSION['user']['role'] !== 'Администратор') {
-  header('Location: ../admin_employees.php');
-  exit;
-}
+require_once __DIR__ . '/functions.php';
+require_admin();
 
 // Валидация данных
 $errors = [];

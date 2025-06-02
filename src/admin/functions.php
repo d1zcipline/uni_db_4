@@ -25,3 +25,46 @@ function require_super_admin($pdo)
 
   return false;
 }
+
+function validate_employee_data($pdo, $data, $currentEmployeeId = null)
+{
+  $errors = [];
+
+  $firstName = trim($data['first_name'] ?? '');
+  $lastName = trim($data['last_name'] ?? '');
+  $email = trim($data['email'] ?? '');
+  $roleId = (int)($data['role'] ?? 0);
+
+  // Проверка обязательных полей
+  if (empty($firstName)) $errors[] = "Имя обязательно для заполнения";
+  if (empty($lastName)) $errors[] = "Фамилия обязательна для заполнения";
+  if (empty($email)) $errors[] = "Email обязателен для заполнения";
+  if ($roleId === 0) $errors[] = "Не выбрана должность";
+
+  if (!empty($data['phone']) && !preg_match('/^\+?\d{10,15}$/', $data['phone'])) {
+    $errors[] = "Некорректный формат телефона";
+  }
+
+  // Проверка формата email
+  if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+    $errors[] = "Некорректный формат email";
+  } else {
+    // Проверка уникальности email
+    $sql = "SELECT COUNT(*) FROM Employees WHERE email = ?";
+    $params = [$email];
+
+    if ($currentEmployeeId !== null) {
+      $sql .= " AND id_employee != ?";
+      $params[] = $currentEmployeeId;
+    }
+
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute($params);
+
+    if ($stmt->fetchColumn() > 0) {
+      $errors[] = "Пользователь с таким email уже существует";
+    }
+  }
+
+  return $errors;
+}
