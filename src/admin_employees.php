@@ -8,20 +8,19 @@ if ($_SESSION['user']['role'] !== 'Администратор') {
   exit;
 }
 
-// Получение списка пользователей (кроме администраторов)
+// Получение списка ВСЕХ пользователей (включая администраторов)
 $stmt = $pdo->prepare("
     SELECT e.id_employee, e.first_name, e.middle_name, e.last_name, e.email, e.phone, p.role, b.bus_park_name
     FROM Employees e
     JOIN Employee_positions p ON e.id_position = p.id_position
     LEFT JOIN Bus_parks b ON e.id_bus_park = b.id_bus_park
-    WHERE p.role IN ('Водитель', 'Диспетчер')
     ORDER BY e.created_at DESC
 ");
 $stmt->execute();
 $employees = $stmt->fetchAll();
 
 // Получение данных для формы
-$rolesStmt = $pdo->query("SELECT * FROM Employee_positions WHERE role IN ('Водитель', 'Диспетчер')");
+$rolesStmt = $pdo->query("SELECT * FROM Employee_positions");
 $roles = $rolesStmt->fetchAll();
 
 $parksStmt = $pdo->query("SELECT * FROM Bus_parks");
@@ -86,7 +85,10 @@ $userName = $_SESSION['user']['name'];
               <label class="form-label">Должность</label>
               <select name="role" class="form-select" required>
                 <?php foreach ($roles as $role): ?>
-                  <option value="<?= $role['id_position'] ?>"><?= $role['role'] ?></option>
+                  <option value="<?= $role['id_position'] ?>"
+                    <?= $role['role'] === 'Администратор' ? 'selected' : '' ?>>
+                    <?= $role['role'] ?>
+                  </option>
                 <?php endforeach; ?>
               </select>
             </div>
@@ -141,19 +143,31 @@ $userName = $_SESSION['user']['name'];
               </thead>
               <tbody>
                 <?php foreach ($employees as $employee): ?>
-                  <tr>
+                  <tr class="<?= $employee['role'] === 'Администратор' ? 'table-warning' : '' ?>">
+
                     <td><?= htmlspecialchars($employee['last_name']) ?> <?= htmlspecialchars($employee['first_name']) ?> <?= htmlspecialchars($employee['middle_name']) ?></td>
                     <td><?= htmlspecialchars($employee['email']) ?></td>
                     <td><?= htmlspecialchars($employee['phone']) ?></td>
-                    <td><?= htmlspecialchars($employee['role']) ?></td>
+                    <td>
+                      <?= htmlspecialchars($employee['role']) ?>
+                      <?php if ($employee['id_employee'] === $_SESSION['user']['id']): ?>
+                        <span class="badge bg-info">Вы</span>
+                      <?php endif; ?>
+                    </td>
                     <td><?= htmlspecialchars($employee['bus_park_name'] ?? 'Не назначен') ?></td>
                     <td>
                       <a href="#" class="btn btn-sm btn-outline-primary me-2">
                         <i class="bi bi-pencil"></i>
                       </a>
-                      <a href="admin/delete_employee.php?id=<?= $employee['id_employee'] ?>" class="btn btn-sm btn-outline-danger">
-                        <i class="bi bi-trash"></i>
-                      </a>
+                      <?php if ($employee['id_employee'] !== $_SESSION['user']['id']): ?>
+                        <a href="admin/delete_employee.php?id=<?= $employee['id_employee'] ?>"
+                          class="btn btn-sm btn-outline-danger"
+                          onclick="return confirm('Вы уверены?')">
+                          <i class="bi bi-trash"></i>
+                        </a>
+                      <?php else: ?>
+                        <span class="text-muted"></span>
+                      <?php endif; ?>
                     </td>
                   </tr>
                 <?php endforeach; ?>

@@ -4,7 +4,7 @@ require '../includes/db.php';
 
 // Проверка прав администратора
 if ($_SESSION['user']['role'] !== 'Администратор') {
-  header('Location: index.php');
+  header('Location: ../admin_employees.php');
   exit;
 }
 
@@ -18,6 +18,12 @@ $password = $_POST['password'] ?? '';
 $confirmPassword = $_POST['confirm_password'] ?? '';
 $roleId = (int)($_POST['role'] ?? 0);
 $busParkId = !empty($_POST['bus_park']) ? (int)$_POST['bus_park'] : null;
+
+// Дополнительная валидация для администраторов
+$roleId = (int)($_POST['role'] ?? 0);
+$roleStmt = $pdo->prepare("SELECT role FROM Employee_positions WHERE id_position = ?");
+$roleStmt->execute([$roleId]);
+$roleName = $roleStmt->fetchColumn();
 
 // Проверка обязательных полей
 if (empty($firstName)) $errors[] = "Имя обязательно для заполнения";
@@ -77,6 +83,9 @@ try {
   ]);
 
   $_SESSION['employee_success'] = "Сотрудник успешно добавлен!";
+  if ($roleName === 'Администратор') {
+    $_SESSION['employee_success'] = "Новый администратор успешно добавлен!";
+  }
 } catch (PDOException $e) {
   $_SESSION['employee_errors'] = ["Ошибка при добавлении сотрудника: " . $e->getMessage()];
 }

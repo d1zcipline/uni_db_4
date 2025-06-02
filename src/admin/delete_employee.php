@@ -1,10 +1,11 @@
 <?php
 session_start();
 require '../includes/db.php';
+require 'functions.php';
 
 // Проверка прав администратора
 if ($_SESSION['user']['role'] !== 'Администратор') {
-  header('Location: index.php');
+  header('Location: ../admin_employees.php');
   exit;
 }
 
@@ -12,11 +13,18 @@ if ($_SESSION['user']['role'] !== 'Администратор') {
 $employeeId = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 if ($employeeId === 0) {
   $_SESSION['employee_errors'] = ["Неверный ID сотрудника"];
-  header('Location: admin_employees.php');
+  header('Location: ../admin_employees.php');
   exit;
 }
 
-// Проверка что сотрудник не администратор
+// Запрет удаления самого себя
+if ($employeeId === $_SESSION['user']['id']) {
+  $_SESSION['employee_errors'] = ["Вы не можете удалить свою учетную запись"];
+  header('Location: ../admin_employees.php');
+  exit;
+}
+
+// Проверка что сотрудник существует
 $stmt = $pdo->prepare("
     SELECT p.role 
     FROM Employees e
@@ -26,10 +34,18 @@ $stmt = $pdo->prepare("
 $stmt->execute([$employeeId]);
 $role = $stmt->fetchColumn();
 
+// Проверка последнего администратора
 if ($role === 'Администратор') {
-  $_SESSION['employee_errors'] = ["Нельзя удалить администратора"];
-  header('Location: ../admin_employees.php');
-  exit;
+  $adminCountStmt = $pdo->query("SELECT COUNT(*) FROM Employees 
+                                  JOIN Employee_positions ON Employees.id_position = Employee_positions.id_position
+                                  WHERE role = 'Администратор'");
+  $adminCount = $adminCountStmt->fetchColumn();
+
+  if ($adminCount <= 1) {
+    $_SESSION['employee_errors'] = ["Нельзя удалить последнего администратора"];
+    header('Location: ../admin_employees.php');
+    exit;
+  }
 }
 
 // Удаление сотрудника
@@ -41,6 +57,15 @@ try {
     $_SESSION['employee_success'] = "Сотрудник успешно удален";
   } else {
     $_SESSION['employee_errors'] = ["Сотрудник не найден"];
+  }
+
+  if ($role === 'Администратор' && !require_super_admin($pdo)) {
+    $_SESSION['employee_errors'] = ["Только главный администратор может удалять других администраторов"];
+    header('Location: ../admin_employees.php');
+    exit;
+  }
+  if ($role === 'Администратор') {
+    $_SESSION['employee_success'] = "Администратор успешно удален";
   }
 } catch (PDOException $e) {
   $_SESSION['employee_errors'] = ["Ошибка при удалении сотрудника: " . $e->getMessage()];
