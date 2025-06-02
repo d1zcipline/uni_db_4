@@ -1,9 +1,9 @@
 <?php
 session_start();
-require 'db.php';
+require '../includes/db.php';
 
 // Проверка прав администратора
-if ($_SESSION['user']['role'] !== 'администратор') {
+if ($_SESSION['user']['role'] !== 'Администратор') {
   header('Location: index.php');
   exit;
 }
@@ -26,9 +26,9 @@ $stmt = $pdo->prepare("
 $stmt->execute([$employeeId]);
 $role = $stmt->fetchColumn();
 
-if ($role === 'администратор') {
+if ($role === 'Администратор') {
   $_SESSION['employee_errors'] = ["Нельзя удалить администратора"];
-  header('Location: admin_employees.php');
+  header('Location: ../admin_employees.php');
   exit;
 }
 
@@ -46,5 +46,5 @@ try {
   $_SESSION['employee_errors'] = ["Ошибка при удалении сотрудника: " . $e->getMessage()];
 }
 
-header('Location: admin_employees.php');
+header('Location: ../admin_employees.php');
 exit;

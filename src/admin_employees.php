@@ -1,9 +1,9 @@
 <?php
 session_start();
-require '../includes/db.php';
+require 'includes/db.php';
 
 // Проверка прав администратора
-if ($_SESSION['user']['role'] !== 'администратор') {
+if ($_SESSION['user']['role'] !== 'Администратор') {
   header('Location: index.php');
   exit;
 }
@@ -14,14 +14,14 @@ $stmt = $pdo->prepare("
     FROM Employees e
     JOIN Employee_positions p ON e.id_position = p.id_position
     LEFT JOIN Bus_parks b ON e.id_bus_park = b.id_bus_park
-    WHERE p.role IN ('водитель', 'диспетчер')
+    WHERE p.role IN ('Водитель', 'Диспетчер')
     ORDER BY e.created_at DESC
 ");
 $stmt->execute();
 $employees = $stmt->fetchAll();
 
 // Получение данных для формы
-$rolesStmt = $pdo->query("SELECT * FROM Employee_positions WHERE role IN ('водитель', 'диспетчер')");
+$rolesStmt = $pdo->query("SELECT * FROM Employee_positions WHERE role IN ('Водитель', 'Диспетчер')");
 $roles = $rolesStmt->fetchAll();
 
 $parksStmt = $pdo->query("SELECT * FROM Bus_parks");
@@ -45,7 +45,7 @@ $userName = $_SESSION['user']['name'];
     <div class="container">
       <a class="navbar-brand" href="index.php">Московский транспорт</a>
       <div class="d-flex align-items-center">
-        <span class="text-light me-3"><?= $userName ?> (администратор)</span>
+        <span class="text-light me-3"><?= $userName ?> (Администратор)</span>
         <a href="logout.php" class="btn btn-outline-light">Выйти</a>
       </div>
     </div>
@@ -60,7 +60,7 @@ $userName = $_SESSION['user']['name'];
         <h5 class="mb-0">Добавить нового сотрудника</h5>
       </div>
       <div class="card-body">
-        <form action="add_employee.php" method="POST">
+        <form action="admin/add_employee.php" method="POST">
           <div class="row g-3">
             <div class="col-md-4">
               <label class="form-label">Имя</label>
@@ -151,7 +151,7 @@ $userName = $_SESSION['user']['name'];
                       <a href="#" class="btn btn-sm btn-outline-primary me-2">
                         <i class="bi bi-pencil"></i>
                       </a>
-                      <a href="delete_employee.php?id=<?= $employee['id_employee'] ?>" class="btn btn-sm btn-outline-danger">
+                      <a href="admin/delete_employee.php?id=<?= $employee['id_employee'] ?>" class="btn btn-sm btn-outline-danger">
                         <i class="bi bi-trash"></i>
                       </a>
                     </td>

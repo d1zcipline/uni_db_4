@@ -1,9 +1,9 @@
 <?php
 session_start();
-require 'db.php';
+require '../includes/db.php';
 
 // Проверка прав администратора
-if ($_SESSION['user']['role'] !== 'администратор') {
+if ($_SESSION['user']['role'] !== 'Администратор') {
   header('Location: index.php');
   exit;
 }
@@ -43,7 +43,7 @@ if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
 // Если есть ошибки - возвращаем
 if (!empty($errors)) {
   $_SESSION['employee_errors'] = $errors;
-  header('Location: admin_employees.php');
+  header('Location: ../admin_employees.php');
   exit;
 }
 
@@ -81,5 +81,5 @@ try {
   $_SESSION['employee_errors'] = ["Ошибка при добавлении сотрудника: " . $e->getMessage()];
 }
 
-header('Location: admin_employees.php');
+header('Location: ../admin_employees.php');
 exit;

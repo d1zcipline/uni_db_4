@@ -11,7 +11,7 @@ if (!isset($_SESSION['user'])) {
 // Подключение страницы в зависимости от роли
 switch ($_SESSION['user']['role']) {
   case 'Администратор':
-    require 'admin/index.php';
+    require 'dashboard_admin.php';
     break;
   case 'Диспетчер':
     require 'dashboard_dispatcher.php';
