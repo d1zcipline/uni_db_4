@@ -30,7 +30,7 @@ $role = $_SESSION['user']['role'];
         <div class="card h-100">
           <div class="card-header bg-primary text-white">Управление сотрудниками</div>
           <div class="card-body">
-            <p>Добавление, редактирование и блокировка учетных записей</p>
+            <p>Управление учетными записями</p>
             <a href="admin_employees.php" class="btn btn-primary">Перейти</a>
           </div>
         </div>

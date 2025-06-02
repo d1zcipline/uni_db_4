@@ -205,7 +205,7 @@ $userName = $_SESSION['user']['name'];
               <button type="submit" class="btn btn-primary me-2">
                 <i class="bi bi-save"></i> Сохранить изменения
               </button>
-              <a href="admin_employees.php" class="btn btn-outline-secondary">
+              <a href="../admin_employees.php" class="btn btn-outline-secondary">
                 <i class="bi bi-arrow-left"></i> Назад к списку
               </a>
             </div>
