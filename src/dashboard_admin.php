@@ -10,18 +10,11 @@ $role = $_SESSION['user']['role'];
   <meta charset="UTF-8">
   <title><?= $title ?></title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
 </head>
 
 <body>
-  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <div class="container">
-      <a class="navbar-brand" href="#">Московский транспорт</a>
-      <div class="d-flex align-items-center">
-        <span class="text-light me-3"><?= $userName ?> (<?= $role ?>)</span>
-        <a href="logout.php" class="btn btn-outline-light">Выйти</a>
-      </div>
-    </div>
-  </nav>
+  <?php include 'includes/admin_navbar.php'; ?>
 
   <div class="container my-5">
     <h1 class="mb-4"><?= $title ?></h1>
@@ -40,7 +33,7 @@ $role = $_SESSION['user']['role'];
           <div class="card-header bg-success text-white">Маршруты</div>
           <div class="card-body">
             <p>Управление маршрутами и расписанием</p>
-            <a href="#" class="btn btn-success">Перейти</a>
+            <a href="admin_routes.php" class="btn btn-success">Перейти</a>
           </div>
         </div>
       </div>
@@ -49,7 +42,7 @@ $role = $_SESSION['user']['role'];
           <div class="card-header bg-info text-white">Транспорт</div>
           <div class="card-body">
             <p>Учет автобусов и их техническое состояние</p>
-            <a href="#" class="btn btn-info">Перейти</a>
+            <a href="admin_bus_parks.php" class="btn btn-info">Перейти</a>
           </div>
         </div>
       </div>

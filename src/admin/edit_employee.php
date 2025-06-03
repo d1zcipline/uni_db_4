@@ -116,15 +116,7 @@ $userName = $_SESSION['user']['name'];
 </head>
 
 <body>
-  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <div class="container">
-      <a class="navbar-brand" href="../index.php">Московский транспорт</a>
-      <div class="d-flex align-items-center">
-        <span class="text-light me-3"><?= $userName ?> (Администратор)</span>
-        <a href="../logout.php" class="btn btn-outline-light">Выйти</a>
-      </div>
-    </div>
-  </nav>
+  <?php include '../includes/admin_navbar.php'; ?>
 
   <div class="container my-5">
     <h1 class="mb-4"><?= $title ?></h1>
