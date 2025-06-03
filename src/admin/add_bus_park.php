@@ -70,5 +70,5 @@ if (!empty($errors)) {
   $_SESSION['park_form_data'] = $_POST;
 }
 
-header('Location: bus_parks.php');
+header('Location: ../admin_bus_parks.php');
 exit;

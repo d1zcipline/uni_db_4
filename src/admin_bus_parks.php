@@ -76,10 +76,10 @@ $userName = $_SESSION['user']['name'];
                         <div class="card-header d-flex justify-content-between align-items-center">
                             <h5 class="mb-0"><?= htmlspecialchars($park['bus_park_name']) ?></h5>
                             <div>
-                                <a href="edit_bus_park.php?id=<?= $park['id_bus_park'] ?>" class="btn btn-sm btn-outline-primary">
+                                <a href="admin/edit_bus_park.php?id=<?= $park['id_bus_park'] ?>" class="btn btn-sm btn-outline-primary">
                                     <i class="bi bi-pencil"></i>
                                 </a>
-                                <a href="delete_bus_park.php?id=<?= $park['id_bus_park'] ?>" class="btn btn-sm btn-outline-danger"
+                                <a href="admin/delete_bus_park.php?id=<?= $park['id_bus_park'] ?>" class="btn btn-sm btn-outline-danger"
                                     onclick="return confirm('Удалить этот автопарк?')">
                                     <i class="bi bi-trash"></i>
                                 </a>
@@ -96,12 +96,6 @@ $userName = $_SESSION['user']['name'];
                                 <i class="bi bi-car-front"></i>
                                 Вместимость: <?= $park['capacity'] ?> автобусов
                             </p>
-                            <div class="mb-3">
-                                <small class="text-muted">Загруженность:</small>
-                                <div class="capacity-bar">
-                                    <div class="capacity-fill" style="width: <?= min(100, ($park['capacity'] > 0 ? (rand(30, 90)) : 0)) ?>%"></div>
-                                </div>
-                            </div>
                         </div>
                     </div>
                 </div>
