@@ -42,25 +42,34 @@ $role = $_SESSION['user']['role'];
           <div class="card-header bg-info text-white">Транспорт</div>
           <div class="card-body">
             <p>Учет автобусов и их техническое состояние</p>
-            <a href="admin_bus_parks.php" class="btn btn-info">Перейти</a>
+            <a href="admin_buses.php" class="btn btn-info">Перейти</a>
           </div>
         </div>
       </div>
       <div class="col-md-4 mb-4">
         <div class="card h-100">
-          <div class="card-header bg-primary text-white">Районы</div>
+          <div class="card-header bg-primary text-white">Автопарки</div>
+          <div class="card-body">
+            <p>Управление автопарками</p>
+            <a href="admin_bus_parks.php" class="btn btn-primary">Перейти</a>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4 mb-4">
+        <div class="card h-100">
+          <div class="card-header bg-success text-white">Районы</div>
           <div class="card-body">
             <p>Управление районами</p>
-            <a href="admin/districts.php" class="btn btn-primary">Перейти</a>
+            <a href="admin/districts.php" class="btn btn-success">Перейти</a>
           </div>
         </div>
       </div>
       <div class="col-md-4 mb-4">
         <div class="card h-100">
-          <div class="card-header bg-success text-white">Адреса</div>
+          <div class="card-header bg-info text-white">Адреса</div>
           <div class="card-body">
-            <p>Управление адресами</p>
-            <a href="admin/locations.php" class="btn btn-success">Перейти</a>
+            <p>Список добавленных адресов</p>
+            <a href="admin/locations.php" class="btn btn-info">Перейти</a>
           </div>
         </div>
       </div>
