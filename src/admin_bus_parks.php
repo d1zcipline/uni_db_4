@@ -13,8 +13,15 @@ $parks = $pdo->query("
     ORDER BY b.bus_park_name
 ")->fetchAll();
 
-// Получение районов для формы
+// Получаем список районов
 $districts = $pdo->query("SELECT * FROM Districts ORDER BY district_name")->fetchAll();
+
+// Проверяем, есть ли районы
+if (empty($districts)) {
+    $_SESSION['park_error'] = "Сначала необходимо добавить хотя бы один район";
+    header('Location: admin/districts.php');
+    exit;
+}
 
 $title = "Управление автопарками";
 $userName = $_SESSION['user']['name'];
@@ -52,7 +59,6 @@ $userName = $_SESSION['user']['name'];
 </head>
 
 <body>
-    <!-- Навигация -->
     <?php include 'includes/admin_navbar.php'; ?>
 
     <div class="container py-5">
@@ -63,7 +69,6 @@ $userName = $_SESSION['user']['name'];
             </button>
         </div>
 
-        <!-- Карточки автопарков -->
         <div class="row">
             <?php foreach ($parks as $park): ?>
                 <div class="col-md-6 mb-4">
@@ -97,17 +102,6 @@ $userName = $_SESSION['user']['name'];
                                     <div class="capacity-fill" style="width: <?= min(100, ($park['capacity'] > 0 ? (rand(30, 90)) : 0)) ?>%"></div>
                                 </div>
                             </div>
-                            <div class="d-flex justify-content-between">
-                                <a href="park_routes.php?id=<?= $park['id_bus_park'] ?>" class="btn btn-outline-primary btn-sm">
-                                    <i class="bi bi-signpost"></i> Маршруты
-                                </a>
-                                <a href="park_buses.php?id=<?= $park['id_bus_park'] ?>" class="btn btn-outline-success btn-sm">
-                                    <i class="bi bi-bus-front"></i> Автобусы
-                                </a>
-                                <a href="park_employees.php?id=<?= $park['id_bus_park'] ?>" class="btn btn-outline-info btn-sm">
-                                    <i class="bi bi-people"></i> Сотрудники
-                                </a>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -115,7 +109,6 @@ $userName = $_SESSION['user']['name'];
         </div>
     </div>
 
-    <!-- Модальное окно добавления автопарка -->
     <div class="modal fade" id="addParkModal" tabindex="-1" aria-labelledby="addParkModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -123,7 +116,7 @@ $userName = $_SESSION['user']['name'];
                     <h5 class="modal-title" id="addParkModalLabel">Добавить новый автопарк</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form action="add_bus_park.php" method="POST">
+                <form action="admin/add_bus_park.php" method="POST">
                     <div class="modal-body">
                         <div class="row g-3">
                             <div class="col-12">
@@ -135,7 +128,9 @@ $userName = $_SESSION['user']['name'];
                                 <select name="id_district" class="form-select" required>
                                     <option value="">Выберите район</option>
                                     <?php foreach ($districts as $district): ?>
-                                        <option value="<?= $district['id_district'] ?>"><?= $district['district_name'] ?></option>
+                                        <option value="<?= $district['id_district'] ?>">
+                                            <?= htmlspecialchars($district['district_name']) ?>
+                                        </option>
                                     <?php endforeach; ?>
                                 </select>
                             </div>

@@ -1,47 +1,74 @@
 <?php
-require_once 'includes/db.php';
-require_once 'admin/functions.php';
+require_once '../includes/db.php';
+require_once 'functions.php';
 session_start();
 require_admin();
 
 $errors = [];
 
 // Валидация данных
-$parkName = trim($_POST['bus_park_name'] ?? '');
-$districtId = (int)($_POST['id_district'] ?? 0);
-$address = trim($_POST['address'] ?? '');
-$capacity = (int)($_POST['capacity'] ?? 0);
+$required = [
+  'bus_park_name' => 'Название автопарка',
+  'id_district' => 'Район',
+  'address' => 'Адрес',
+  'capacity' => 'Вместимость'
+];
 
-if (empty($parkName)) $errors[] = "Название автопарка обязательно";
-if ($districtId === 0) $errors[] = "Необходимо выбрать район";
-if (empty($address)) $errors[] = "Адрес обязателен";
-if ($capacity <= 0) $errors[] = "Вместимость должна быть больше 0";
+foreach ($required as $field => $name) {
+  if (empty($_POST[$field])) {
+    $errors[] = "Поле '$name' обязательно для заполнения";
+  }
+}
+
+// Проверка числовых значений
+if (!is_numeric($_POST['capacity']) || $_POST['capacity'] <= 0) {
+  $errors[] = "Вместимость должна быть положительным числом";
+}
+
+// Проверка существования района
+if (empty($errors)) {
+  $stmt = $pdo->prepare("SELECT 1 FROM Districts WHERE id_district = ?");
+  $stmt->execute([$_POST['id_district']]);
+  if (!$stmt->fetch()) {
+    $errors[] = "Указанный район не существует";
+  }
+}
 
 if (empty($errors)) {
   try {
-    // Сначала добавляем локацию
+    // Добавляем локацию
     $stmt = $pdo->prepare("
             INSERT INTO Locations (id_district, address)
             VALUES (?, ?)
         ");
-    $stmt->execute([$districtId, $address]);
+    $stmt->execute([
+      $_POST['id_district'],
+      trim($_POST['address'])
+    ]);
     $locationId = $pdo->lastInsertId();
 
-    // Затем добавляем автопарк
+    // Добавляем автопарк
     $stmt = $pdo->prepare("
             INSERT INTO Bus_parks (id_location, bus_park_name, capacity)
             VALUES (?, ?, ?)
         ");
-    $stmt->execute([$locationId, $parkName, $capacity]);
+    $stmt->execute([
+      $locationId,
+      trim($_POST['bus_park_name']),
+      (int)$_POST['capacity']
+    ]);
 
-    $_SESSION['success'] = "Автопарк успешно добавлен!";
-    header('Location: bus_parks.php');
-    exit;
+    $_SESSION['park_success'] = "Автопарк успешно добавлен!";
   } catch (PDOException $e) {
-    $errors[] = "Ошибка при добавлении автопарка: " . $e->getMessage();
+    $errors[] = "Ошибка базы данных: " . $e->getMessage();
+    error_log("DB Error: " . $e->getMessage());
   }
 }
 
-$_SESSION['errors'] = $errors;
+if (!empty($errors)) {
+  $_SESSION['park_errors'] = $errors;
+  $_SESSION['park_form_data'] = $_POST;
+}
+
 header('Location: bus_parks.php');
 exit;
