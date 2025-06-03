@@ -29,6 +29,9 @@ $userName = $_SESSION['user']['name'];
 $role = $_SESSION['user']['role'];
 ?>
 
+<!DOCTYPE html>
+<html lang="ru">
+
 <head>
   <meta charset="UTF-8">
   <title><?= $title ?></title>

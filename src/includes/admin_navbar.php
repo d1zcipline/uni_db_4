@@ -22,7 +22,7 @@
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="buses.php">
+          <a class="nav-link" href="/admin_buses.php">
             <i class="bi bi-bus-front"></i> Автобусы
           </a>
         </li>

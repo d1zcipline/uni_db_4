@@ -73,6 +73,24 @@ $role = $_SESSION['user']['role'];
           </div>
         </div>
       </div>
+      <div class="col-md-4 mb-4">
+        <div class="card h-100">
+          <div class="card-header bg-primary text-white">Типы автобусов</div>
+          <div class="card-body">
+            <p>Управление типами автобусов</p>
+            <a href="admin/admin_bus_types.php" class="btn btn-primary">Перейти</a>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4 mb-4">
+        <div class="card h-100">
+          <div class="card-header bg-success text-white">Статусы состояния автобусов</div>
+          <div class="card-body">
+            <p>Управление статусами</p>
+            <a href="admin/statuses.php" class="btn btn-success">Перейти</a>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </body>

@@ -4,19 +4,6 @@ require_once 'admin/functions.php';
 session_start();
 require_admin();
 
-// Вывод сообщений об ошибках и успехе
-if (isset($_SESSION['route_errors'])) {
-  foreach ($_SESSION['route_errors'] as $error) {
-    echo '<div class="alert alert-danger">' . htmlspecialchars($error) . '</div>';
-  }
-  unset($_SESSION['route_errors']);
-}
-
-if (isset($_SESSION['route_success'])) {
-  echo '<div class="alert alert-success">' . htmlspecialchars($_SESSION['route_success']) . '</div>';
-  unset($_SESSION['route_success']);
-}
-
 // Восстановление данных формы при ошибке
 $formData = $_SESSION['route_form_data'] ?? [];
 unset($_SESSION['route_form_data']);
@@ -95,7 +82,20 @@ $userName = $_SESSION['user']['name'];
         </form>
       </div>
     </div>
+    <?php
+    if (isset($_SESSION['route_success'])) {
+      echo '<div class="alert alert-success">' . htmlspecialchars($_SESSION['route_success']) . '</div>';
+      unset($_SESSION['route_success']);
+    }
 
+    // Вывод сообщений об ошибках и успехе
+    if (isset($_SESSION['route_errors'])) {
+      foreach ($_SESSION['route_errors'] as $error) {
+        echo '<div class="alert alert-danger">' . htmlspecialchars($error) . '</div>';
+      }
+      unset($_SESSION['route_errors']);
+    }
+    ?>
     <!-- Список маршрутов -->
     <div class="row">
       <?php foreach ($routes as $route): ?>
@@ -109,6 +109,7 @@ $userName = $_SESSION['user']['name'];
                 </span>
               </h5>
               <div>
+                <!-- FIX -->
                 <a href="edit_route.php?id=<?= $route['id_route'] ?>" class="btn btn-sm btn-outline-primary">
                   <i class="bi bi-pencil"></i>
                 </a>
@@ -150,7 +151,7 @@ $userName = $_SESSION['user']['name'];
           <h5 class="modal-title" id="addRouteModalLabel">Добавить новый маршрут</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
-        <form action="/admin/add_route.php" method="POST">
+        <form action="admin/add_route.php" method="POST">
           <div class="modal-body">
             <div class="row g-3">
               <div class="col-md-6">
@@ -160,8 +161,8 @@ $userName = $_SESSION['user']['name'];
               </div>
               <div class="col-md-6">
                 <label class="form-label">Название маршрута</label>
-                <input type="text" name="route_number" class="form-control"
-                  value="<?= htmlspecialchars($formData['route_number'] ?? '') ?>" required>
+                <input type="text" name="route_name" class="form-control"
+                  value="<?= htmlspecialchars($formData['route_name'] ?? '') ?>" required>
               </div>
               <div class="col-md-4">
                 <label class="form-label">Тип маршрута</label>

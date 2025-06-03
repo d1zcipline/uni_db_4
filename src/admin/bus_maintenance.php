@@ -20,7 +20,7 @@ $bus = $stmt->fetch();
 
 if (!$bus) {
   $_SESSION['bus_error'] = "Автобус не найден";
-  header('Location: buses.php');
+  header('Location: ../admin_buses.php');
   exit;
 }
 
@@ -117,7 +117,7 @@ $role = $_SESSION['user']['role'];
         Техническое обслуживание:
         <span class="text-primary"><?= htmlspecialchars($bus['license_plate']) ?></span>
       </h1>
-      <a href="buses.php" class="btn btn-outline-secondary">
+      <a href="../admin_buses.php" class="btn btn-outline-secondary">
         <i class="bi bi-arrow-left"></i> Назад к списку
       </a>
     </div>

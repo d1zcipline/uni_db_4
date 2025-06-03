@@ -1,6 +1,6 @@
 <?php
 require_once '../includes/db.php';
-require_once '../admin/functions.php';
+require_once 'functions.php';
 session_start();
 require_admin();
 
@@ -36,7 +36,7 @@ try {
   // Если есть ошибки - возвращаем их
   if (!empty($response['errors'])) {
     $_SESSION['route_errors'] = $response['errors'];
-    header('Location: /admin_routes.php');
+    header('Location: ../admin_routes.php');
     exit;
   }
 
@@ -93,5 +93,5 @@ if (!empty($response['errors'])) {
 }
 
 // Перенаправляем обратно на страницу маршрутов
-header('Location: /admin_routes.php');
+header('Location: ../admin_routes.php');
 exit;

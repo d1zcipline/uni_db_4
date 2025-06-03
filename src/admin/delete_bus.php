@@ -19,7 +19,6 @@ if (!$bus) {
 
 // Проверяем связанные записи
 $checks = [
-  'Work_shifts' => "SELECT COUNT(*) FROM Work_shifts WHERE id_bus = ?",
   'Maintenance_records' => "SELECT COUNT(*) FROM Maintenance_records WHERE id_bus = ?"
 ];
 
