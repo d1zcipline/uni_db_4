@@ -101,6 +101,8 @@ $title = "Техническое обслуживание автобуса " . $
 $userName = $_SESSION['user']['name'];
 $role = $_SESSION['user']['role'];
 ?>
+<!DOCTYPE html>
+<html lang="ru">
 
 <head>
   <meta charset="UTF-8">
@@ -165,10 +167,17 @@ $role = $_SESSION['user']['role'];
           <?php unset($_SESSION['maintenance_errors']); ?>
         <?php endif; ?>
 
+        <?php if (isset($_SESSION['maintenance_success'])): ?>
+          <div class="alert alert-success">
+            <?= $_SESSION['maintenance_success'] ?>
+          </div>
+          <?php unset($_SESSION['maintenance_success']); ?>
+        <?php endif; ?>
+
         <form method="POST">
           <div class="row g-3">
             <div class="col-md-4">
-              <label class="form-label">Тип обслуживания</label>
+              <label class="form-label">Тип обслуживания*</label>
               <select name="id_maintenance_type" class="form-select" required>
                 <option value="">Выберите тип</option>
                 <?php foreach ($maintenanceTypes as $type): ?>
@@ -179,7 +188,7 @@ $role = $_SESSION['user']['role'];
               </select>
             </div>
             <div class="col-md-4">
-              <label class="form-label">Статус</label>
+              <label class="form-label">Статус*</label>
               <select name="id_maintenance_status" class="form-select" required>
                 <?php foreach ($maintenanceStatuses as $status): ?>
                   <option value="<?= $status['id_maintenance_status'] ?>"
@@ -190,7 +199,7 @@ $role = $_SESSION['user']['role'];
               </select>
             </div>
             <div class="col-md-4">
-              <label class="form-label">Дата обслуживания</label>
+              <label class="form-label">Дата обслуживания*</label>
               <input type="date" name="maintenance_date" class="form-control"
                 value="<?= date('Y-m-d') ?>" required>
             </div>
@@ -204,7 +213,7 @@ $role = $_SESSION['user']['role'];
               <input type="text" name="description" class="form-control"
                 placeholder="Что было сделано...">
             </div>
-            <div class="col-12">
+            <div class="col-12 mt-3">
               <button type="submit" name="add_maintenance" class="btn btn-primary">
                 <i class="bi bi-save"></i> Добавить запись
               </button>
@@ -241,14 +250,14 @@ $role = $_SESSION['user']['role'];
                     <td><?= htmlspecialchars($record['maintenance_type_name']) ?></td>
                     <td>
                       <span class="badge bg-<?=
-                                            $record['id_maintenance_status'] == 2 ? 'success' : 'warning' ?>">
+                                            $record['id_maintenance_status'] == 2 ? 'success' : ($record['id_maintenance_status'] == 1 ? 'warning' : 'secondary') ?>">
                         <?= htmlspecialchars($record['maintenance_status']) ?>
                       </span>
                     </td>
-                    <td><?=
-                        $record['completion_date'] ?
-                          htmlspecialchars($record['completion_date']) :
-                          '<span class="text-muted">В процессе</span>' ?>
+                    <td>
+                      <?= $record['completion_date'] ?
+                        htmlspecialchars($record['completion_date']) :
+                        '<span class="text-muted">-</span>' ?>
                     </td>
                     <td><?=
                         $record['description'] ?
@@ -265,3 +274,23 @@ $role = $_SESSION['user']['role'];
     </div>
   </div>
 </body>
+
+</html>
+<?php
+// Вспомогательная функция для получения класса бейджа статуса
+function getStatusBadgeClass($status)
+{
+  switch ($status) {
+    case 'В эксплуатации':
+      return 'success';
+    case 'На обслуживании':
+      return 'warning';
+    case 'Списан':
+      return 'secondary';
+    case 'Аварийный':
+      return 'danger';
+    default:
+      return 'info';
+  }
+}
+?>
