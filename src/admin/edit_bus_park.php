@@ -76,7 +76,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       ]);
 
       $_SESSION['park_success'] = "Автопарк успешно обновлен";
-      header('Location: bus_parks.php');
+      header('Location: ../admin_bus_parks.php');
       exit;
     } catch (PDOException $e) {
       $errors[] = "Ошибка базы данных: " . $e->getMessage();
