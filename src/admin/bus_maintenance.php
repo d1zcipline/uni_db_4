@@ -97,6 +97,86 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_maintenance'])) {
   }
 }
 
+// Обработка обновления записи ТО
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_maintenance'])) {
+  $recordId = (int)$_POST['record_id'];
+  $errors = [];
+
+  if (empty($_POST['id_maintenance_type'])) {
+    $errors[] = "Тип обслуживания обязателен";
+  }
+
+  if (empty($_POST['maintenance_date'])) {
+    $errors[] = "Дата обслуживания обязательна";
+  }
+
+  if (empty($errors)) {
+    try {
+      $pdo->beginTransaction();
+
+      // Обновляем запись о ТО
+      $stmt = $pdo->prepare("
+                UPDATE Maintenance_records SET
+                    id_maintenance_type = ?,
+                    id_maintenance_status = ?,
+                    maintenance_date = ?,
+                    completion_date = ?,
+                    description = ?
+                WHERE id_maintenance = ?
+            ");
+
+      $stmt->execute([
+        $_POST['id_maintenance_type'],
+        $_POST['id_maintenance_status'],
+        $_POST['maintenance_date'],
+        $_POST['completion_date'] ?? null,
+        $_POST['description'] ?? null,
+        $recordId
+      ]);
+
+      // Обновляем дату последнего ТО у автобуса, если обслуживание завершено
+      if ($_POST['id_maintenance_status'] == 2) {
+        $stmt = $pdo->prepare("
+                    UPDATE Buses 
+                    SET last_maintenance_date = ?
+                    WHERE id_bus = ?
+                ");
+        $stmt->execute([$_POST['maintenance_date'], $busId]);
+      }
+
+      $pdo->commit();
+      $_SESSION['maintenance_success'] = "Запись о техническом обслуживании обновлена";
+      header("Location: bus_maintenance.php?id=$busId");
+      exit;
+    } catch (PDOException $e) {
+      $pdo->rollBack();
+      $errors[] = "Ошибка базы данных: " . $e->getMessage();
+    }
+  }
+
+  if (!empty($errors)) {
+    $_SESSION['maintenance_errors'] = $errors;
+  }
+}
+
+// Получение записи для редактирования
+$editRecord = null;
+if (isset($_GET['edit'])) {
+  $recordId = (int)$_GET['edit'];
+  $stmt = $pdo->prepare("
+        SELECT * FROM Maintenance_records 
+        WHERE id_maintenance = ?
+    ");
+  $stmt->execute([$recordId]);
+  $editRecord = $stmt->fetch();
+
+  if (!$editRecord || $editRecord['id_bus'] != $busId) {
+    $_SESSION['maintenance_error'] = "Запись не найдена или не принадлежит этому автобусу";
+    header("Location: bus_maintenance.php?id=$busId");
+    exit;
+  }
+}
+
 $title = "Техническое обслуживание автобуса " . $bus['license_plate'];
 $userName = $_SESSION['user']['name'];
 $role = $_SESSION['user']['role'];
@@ -113,13 +193,14 @@ $role = $_SESSION['user']['role'];
 
 <body>
   <?php include '../includes/admin_navbar.php'; ?>
+
   <div class="container py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
       <h1>
         Техническое обслуживание:
         <span class="text-primary"><?= htmlspecialchars($bus['license_plate']) ?></span>
       </h1>
-      <a href="../admin_buses.php" class="btn btn-outline-secondary">
+      <a href="buses.php" class="btn btn-outline-secondary">
         <i class="bi bi-arrow-left"></i> Назад к списку
       </a>
     </div>
@@ -152,10 +233,12 @@ $role = $_SESSION['user']['role'];
       </div>
     </div>
 
-    <!-- Форма добавления записи ТО -->
+    <!-- Форма добавления/редактирования записи ТО -->
     <div class="card mb-4">
       <div class="card-header">
-        <h5 class="mb-0">Добавить запись о техническом обслуживании</h5>
+        <h5 class="mb-0">
+          <?= $editRecord ? 'Редактирование записи ТО' : 'Добавить запись о техническом обслуживании' ?>
+        </h5>
       </div>
       <div class="card-body">
         <?php if (isset($_SESSION['maintenance_errors'])): ?>
@@ -175,13 +258,18 @@ $role = $_SESSION['user']['role'];
         <?php endif; ?>
 
         <form method="POST">
+          <?php if ($editRecord): ?>
+            <input type="hidden" name="record_id" value="<?= $editRecord['id_maintenance'] ?>">
+          <?php endif; ?>
+
           <div class="row g-3">
             <div class="col-md-4">
               <label class="form-label">Тип обслуживания*</label>
               <select name="id_maintenance_type" class="form-select" required>
                 <option value="">Выберите тип</option>
                 <?php foreach ($maintenanceTypes as $type): ?>
-                  <option value="<?= $type['id_maintenance_type'] ?>">
+                  <option value="<?= $type['id_maintenance_type'] ?>"
+                    <?= ($editRecord && $editRecord['id_maintenance_type'] == $type['id_maintenance_type']) ? 'selected' : '' ?>>
                     <?= htmlspecialchars($type['maintenance_type_name']) ?>
                   </option>
                 <?php endforeach; ?>
@@ -192,7 +280,7 @@ $role = $_SESSION['user']['role'];
               <select name="id_maintenance_status" class="form-select" required>
                 <?php foreach ($maintenanceStatuses as $status): ?>
                   <option value="<?= $status['id_maintenance_status'] ?>"
-                    <?= $status['id_maintenance_status'] == 2 ? 'selected' : '' ?>>
+                    <?= ($editRecord && $editRecord['id_maintenance_status'] == $status['id_maintenance_status']) ? 'selected' : '' ?>>
                     <?= htmlspecialchars($status['maintenance_status']) ?>
                   </option>
                 <?php endforeach; ?>
@@ -201,22 +289,32 @@ $role = $_SESSION['user']['role'];
             <div class="col-md-4">
               <label class="form-label">Дата обслуживания*</label>
               <input type="date" name="maintenance_date" class="form-control"
-                value="<?= date('Y-m-d') ?>" required>
+                value="<?= $editRecord ? htmlspecialchars($editRecord['maintenance_date']) : date('Y-m-d') ?>" required>
             </div>
             <div class="col-md-6">
               <label class="form-label">Дата завершения</label>
               <input type="date" name="completion_date" class="form-control"
-                value="<?= date('Y-m-d') ?>">
+                value="<?= $editRecord ? htmlspecialchars($editRecord['completion_date']) : date('Y-m-d') ?>">
             </div>
             <div class="col-md-6">
               <label class="form-label">Описание</label>
               <input type="text" name="description" class="form-control"
-                placeholder="Что было сделано...">
+                placeholder="Что было сделано или будет сделано"
+                value="<?= $editRecord ? htmlspecialchars($editRecord['description']) : '' ?>">
             </div>
             <div class="col-12 mt-3">
-              <button type="submit" name="add_maintenance" class="btn btn-primary">
-                <i class="bi bi-save"></i> Добавить запись
-              </button>
+              <?php if ($editRecord): ?>
+                <button type="submit" name="update_maintenance" class="btn btn-primary">
+                  <i class="bi bi-save"></i> Сохранить изменения
+                </button>
+                <a href="bus_maintenance.php?id=<?= $busId ?>" class="btn btn-outline-secondary">
+                  <i class="bi bi-x"></i> Отмена
+                </a>
+              <?php else: ?>
+                <button type="submit" name="add_maintenance" class="btn btn-primary">
+                  <i class="bi bi-plus"></i> Добавить запись
+                </button>
+              <?php endif; ?>
             </div>
           </div>
         </form>
@@ -241,6 +339,7 @@ $role = $_SESSION['user']['role'];
                   <th>Статус</th>
                   <th>Дата завершения</th>
                   <th>Описание</th>
+                  <th>Действия</th>
                 </tr>
               </thead>
               <tbody>
@@ -264,6 +363,19 @@ $role = $_SESSION['user']['role'];
                           htmlspecialchars($record['description']) :
                           '<span class="text-muted">Нет описания</span>' ?>
                     </td>
+                    <td>
+                      <div class="d-flex">
+                        <a href="bus_maintenance.php?id=<?= $busId ?>&edit=<?= $record['id_maintenance'] ?>"
+                          class="btn btn-sm btn-outline-primary me-2">
+                          <i class="bi bi-pencil"></i>
+                        </a>
+                        <a href="delete_maintenance.php?id=<?= $record['id_maintenance'] ?>&bus_id=<?= $busId ?>"
+                          class="btn btn-sm btn-outline-danger"
+                          onclick="return confirm('Удалить эту запись обслуживания?')">
+                          <i class="bi bi-trash"></i>
+                        </a>
+                      </div>
+                    </td>
                   </tr>
                 <?php endwhile; ?>
               </tbody>
@@ -276,7 +388,9 @@ $role = $_SESSION['user']['role'];
 </body>
 
 </html>
+
 <?php
+
 // Вспомогательная функция для получения класса бейджа статуса
 function getStatusBadgeClass($status)
 {
