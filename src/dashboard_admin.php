@@ -109,6 +109,33 @@ $role = $_SESSION['user']['role'];
           </div>
         </div>
       </div>
+      <div class="col-md-4 mb-4">
+        <div class="card h-100">
+          <div class="card-header bg-success text-white">Типы смен</div>
+          <div class="card-body">
+            <p>Управление типами смен</p>
+            <a href="admin/shift_types.php" class="btn btn-success">Перейти</a>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4 mb-4">
+        <div class="card h-100">
+          <div class="card-header bg-info text-white">Смены водителей</div>
+          <div class="card-body">
+            <p>Управление сменами водителей</p>
+            <a href="admin/work_shifts.php" class="btn btn-info">Перейти</a>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4 mb-4">
+        <div class="card h-100">
+          <div class="card-header bg-primary text-white">Расписание</div>
+          <div class="card-body">
+            <p>Управление расписанием</p>
+            <a href="admin/schedule.php" class="btn btn-primary">Перейти</a>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </body>
