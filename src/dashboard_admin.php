@@ -136,6 +136,15 @@ $role = $_SESSION['user']['role'];
           </div>
         </div>
       </div>
+      <div class="col-md-4 mb-4">
+        <div class="card h-100">
+          <div class="card-header bg-success text-white">Роли</div>
+          <div class="card-body">
+            <p>Управление ролями пользователей</p>
+            <a href="admin/employee_positions.php" class="btn btn-success">Перейти</a>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </body>
