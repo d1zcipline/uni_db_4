@@ -60,10 +60,12 @@ CREATE TABLE Work_shift_types (
 CREATE TABLE Work_shifts (
     id_work_shift INT AUTO_INCREMENT PRIMARY KEY,
     id_work_shift_type INT,
+    id_route INT,
     id_employee INT,
     shift_date DATE,
     FOREIGN KEY (id_work_shift_type) REFERENCES Work_shift_types(id_work_shift_type),
-    FOREIGN KEY (id_employee) REFERENCES Employees(id_employee)
+    FOREIGN KEY (id_employee) REFERENCES Employees(id_employee),
+    FOREIGN KEY (id_route) REFERENCES Routes(id_route)
 );
 
 -- Создание таблицы Bus_types
