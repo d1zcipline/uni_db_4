@@ -1,5 +1,5 @@
 <?php
-$title = "Панель водителя";
+$title = "Панель диспетчера";
 $userName = $_SESSION['user']['name'];
 $role = $_SESSION['user']['role'];
 ?>
@@ -14,7 +14,7 @@ $role = $_SESSION['user']['role'];
 </head>
 
 <body>
-  <?php include 'includes/driver_navbar.php'; ?>
+  <?php include 'includes/dispatcher_navbar.php'; ?>
 
   <div class="container my-5">
     <h1 class="mb-4"><?= $title ?></h1>
